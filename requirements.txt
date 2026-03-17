@@ -1,6 +1,6 @@
-torch
-torchvision
 numpy
 matplotlib
 tqdm
 gradio
+tensorflow
+pickle
