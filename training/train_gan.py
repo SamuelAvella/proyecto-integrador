@@ -1,3 +1,5 @@
+import time
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -7,12 +9,12 @@ import os
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from models.conditional_gan import Generator, Discriminator
+from tqdm import tqdm
 
 os.makedirs("generated_images", exist_ok=True)
 os.makedirs("checkpoints", exist_ok=True)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Usando: {DEVICE}")
 
 
 # ─────────────────────────────────────────
@@ -53,7 +55,7 @@ def train():
     dataset    = datasets.CIFAR10(root="./data", train=True,
                                   download=True, transform=transform)
     dataloader = DataLoader(dataset, batch_size=64,
-                            shuffle=True, num_workers=4, pin_memory=True)
+                            shuffle=True, num_workers=2, pin_memory=True)
 
     num_classes = 10
     noise_dim   = 100
@@ -72,7 +74,11 @@ def train():
     criterion = nn.BCELoss()
 
     for epoch in range(1, epochs + 1):
+        start_time = time.time()
         d_losses, g_losses = [], []
+
+        loop = tqdm(dataloader, desc=f"Epoch {epoch}/{epochs}", leave=False)
+
 
         for real_imgs, real_labels in dataloader:
             real_imgs   = real_imgs.to(DEVICE)
@@ -115,16 +121,24 @@ def train():
             d_losses.append(d_loss.item())
             g_losses.append(g_loss_accum / 2)
 
+            # 🔥 Actualizar barra en tiempo real
+            loop.set_postfix({
+                "D_loss": f"{d_loss.item():.3f}",
+                "G_loss": f"{(g_loss_accum/2):.3f}"
+            })
+
         g_sched.step()
         d_sched.step()
 
         
-        print(
-          f"Epoch {epoch:4d} | "
-          f"D loss: {np.mean(d_losses):.4f} | "
-          f"G loss: {np.mean(g_losses):.4f}"
-        )
+        epoch_time = time.time() - start_time
 
+        tqdm.write(
+            f"Epoch {epoch:3d}/{epochs} | "
+            f"D: {np.mean(d_losses):.4f} | "
+            f"G: {np.mean(g_losses):.4f} | "
+            f"⏱ {epoch_time:.1f}s"
+        )
         if epoch % 10 == 0:
             save_images(G, epoch)
             torch.save(G.state_dict(), f"checkpoints/generator_{epoch:05d}.pt")
@@ -136,4 +150,5 @@ def train():
 
 
 if __name__ == "__main__":
+    print(f"Usando: {DEVICE}")
     train()

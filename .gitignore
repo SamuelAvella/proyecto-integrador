@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 *.keras
 /venv/
+/data/cifar-10*
