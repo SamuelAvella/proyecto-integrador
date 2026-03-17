@@ -1,0 +1,52 @@
+{
+  "airplane": [
+    "a flying vehicle with wings",
+    "an aircraft that travels in the sky",
+    "a machine used for air transportation"
+  ],
+  "automobile": [
+    "a road vehicle with four wheels",
+    "a car used for transportation",
+    "a motor vehicle for driving"
+  ],
+  "bird": [
+    "an animal with feathers and wings",
+    "a creature that can usually fly",
+    "a small flying animal"
+  ],
+  "cat": [
+    "a small domesticated animal with fur",
+    "a pet that likes to sleep and hunt",
+    "a feline animal"
+  ],
+  "deer": [
+    "a wild animal with antlers",
+    "a forest animal that runs fast",
+    "a herbivorous mammal"
+  ],
+  "dog": [
+    "a loyal domesticated animal",
+    "a pet that barks",
+    "a canine animal"
+  ],
+  "frog": [
+    "a small green amphibian",
+    "an animal that jumps and lives near water",
+    "a creature with smooth skin"
+  ],
+  "horse": [
+    "a large animal used for riding",
+    "a fast running mammal",
+    "an animal used in farms"
+  ],
+  "ship": [
+    "a large boat that travels on water",
+    "a vessel used for sea transportation",
+    "a watercraft"
+  ],
+  "truck": [
+    "a large vehicle for transporting goods",
+    "a heavy duty automobile",
+    "a transport vehicle"
+  ]
+}
