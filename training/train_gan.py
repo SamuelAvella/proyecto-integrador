@@ -8,7 +8,7 @@ import os
 
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-from models.conditional_gan import Generator, Discriminator
+from models.conditional_gan import Generator, Discriminator, weights_init
 from tqdm import tqdm
 
 os.makedirs("generated_images", exist_ok=True)
@@ -63,6 +63,9 @@ def train():
 
     G = Generator(num_classes, noise_dim).to(DEVICE)
     D = Discriminator(num_classes).to(DEVICE)
+
+    G.apply(weights_init)
+    D.apply(weights_init)
 
     g_opt = torch.optim.Adam(G.parameters(), lr=0.0001, betas=(0.5, 0.999))
     d_opt = torch.optim.Adam(D.parameters(), lr=0.0002, betas=(0.5, 0.999))
