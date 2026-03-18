@@ -74,7 +74,7 @@ def train():
 
     num_classes = 10
     noise_dim = 100
-    epochs = 50
+    epochs = 100
 
     # Models
     G = Generator(num_classes, noise_dim).to(DEVICE)
@@ -88,7 +88,7 @@ def train():
     g_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
     d_opt = torch.optim.Adam(D.parameters(), lr=0.0002, betas=(0.5, 0.999))
 
-    criterion = nn.BCELoss()
+    criterion = nn.BCEWithLogitsLoss()   # ← más estable que BCELoss+Sigmoid
 
     global_step = 0
 
@@ -133,36 +133,33 @@ def train():
             # ───────────────
             # Train G
             # ───────────────
-            g_loss_accum = 0.0
+            noise = torch.randn(batch_size, noise_dim, device=DEVICE)
+            sampled_labels = torch.randint(0, num_classes, (batch_size,), device=DEVICE)
 
-            for _ in range(2):
-                noise = torch.randn(batch_size, noise_dim, device=DEVICE)
-                sampled_labels = torch.randint(0, num_classes, (batch_size,), device=DEVICE)
+            g_opt.zero_grad()
 
-                g_opt.zero_grad()
+            fake_imgs = G(noise, sampled_labels)
 
-                fake_imgs = G(noise, sampled_labels)
-                g_loss = criterion(
-                    D(fake_imgs, sampled_labels),
-                    torch.ones(batch_size, 1, device=DEVICE)
-                )
+            # Le decimos a D que evalúe las imágenes falsas
+            # y le pasamos torch.ones porque queremos que D diga "real"
+            # — eso significa que G ha engañado al discriminador
+            g_loss = criterion(
+                D(fake_imgs, sampled_labels),
+                torch.ones(batch_size, 1, device=DEVICE)
+            )
 
-                g_loss.backward()
-                g_opt.step()
-
-                g_loss_accum += g_loss.item()
-
-            g_loss_avg = g_loss_accum / 2
+            g_loss.backward()
+            g_opt.step()
 
             # ───────────────
             # TensorBoard
             # ───────────────
             writer.add_scalar("Loss/Discriminator", d_loss.item(), global_step)
-            writer.add_scalar("Loss/Generator", g_loss_avg, global_step)
+            writer.add_scalar("Loss/Generator", g_loss.item(), global_step)
 
             loop.set_postfix({
                 "D_loss": f"{d_loss.item():.3f}",
-                "G_loss": f"{g_loss_avg:.3f}"
+                "G_loss": f"{g_loss.item():.3f}"
             })
 
             global_step += 1
