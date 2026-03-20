@@ -4,3 +4,4 @@ tqdm
 gradio
 tensorflow
 pickle
+pytorch-fid

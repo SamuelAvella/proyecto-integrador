@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 def weights_init(m):
     if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
         nn.init.normal_(m.weight.data, 0.0, 0.02)
@@ -89,14 +90,17 @@ class Discriminator(nn.Module):
             # Primera capa sin BN (estándar en DCGAN)
             nn.Conv2d(4, 64, 4, 2, 1),
             nn.LeakyReLU(0.2, inplace=True),    # LeakyReLU en D, no muere con valores negativos
+            nn.Dropout2d(0.25),
 
             nn.Conv2d(64, 128, 4, 2, 1, bias=False),
             nn.BatchNorm2d(128),
             nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout2d(0.25),
 
             nn.Conv2d(128, 256, 4, 2, 1, bias=False),
             nn.BatchNorm2d(256),
             nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout2d(0.25),
 
             # (256, 4, 4) → escalar
             nn.Conv2d(256, 1, 4, 1, 0, bias=False),
