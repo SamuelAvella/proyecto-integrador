@@ -76,20 +76,24 @@ def evaluate_fid(generator, real_features, inception_model, noise_dim, num_class
 
 # ── Image saving ──────────────────────────────────────────────────────────────
 
+CIFAR10_CLASSES = ['airplane','automobile','bird','cat','deer',
+                   'dog','frog','horse','ship','truck']
+
 def save_images(generator, epoch):
     generator.eval()
     with torch.no_grad():
         imgs = generator(FIXED_NOISE, FIXED_LABELS).cpu()
     imgs = (imgs + 1) / 2
-    fig, axes = plt.subplots(4, 4, figsize=(6, 6))
+    fig, axes = plt.subplots(4, 4, figsize=(8, 8))
     for i, ax in enumerate(axes.flat):
         ax.imshow(np.clip(imgs[i].permute(1, 2, 0).numpy(), 0, 1))
+        ax.set_title(CIFAR10_CLASSES[FIXED_LABELS[i].item()], fontsize=8)
         ax.axis("off")
     plt.tight_layout()
     plt.savefig(f"generated_images/epoch_{epoch:05d}.png")
     plt.close()
     generator.train()
-
+  
 # ── Checkpoint helpers ────────────────────────────────────────────────────────
 
 def save_checkpoint(epoch, G, D, g_opt, d_opt, g_scheduler, d_scheduler):
@@ -196,7 +200,7 @@ def train():
             d_loss.backward()
             d_opt.step()
 
-            for _ in range(2):
+            for _ in range(1):
                 noise          = torch.randn(batch_size, noise_dim, device=DEVICE)
                 sampled_labels = torch.randint(0, num_classes, (batch_size,), device=DEVICE)
                 g_opt.zero_grad()
