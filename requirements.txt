@@ -5,4 +5,4 @@ gradio
 tensorflow
 pickle
 pytorch_fid
-gradio
+Pillow
