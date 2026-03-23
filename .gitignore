@@ -4,3 +4,5 @@ __pycache__/
 /venv/
 /data/cifar-10*
 /generated_images/
+*.pt
+/runs

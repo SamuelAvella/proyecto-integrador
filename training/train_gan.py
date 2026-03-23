@@ -2,8 +2,12 @@ import time
 import torch
 import torch.nn as nn
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # backend sin GUI, solo guarda archivos
 import matplotlib.pyplot as plt
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
@@ -123,7 +127,7 @@ def load_checkpoint(path, G, D, g_opt, d_opt, g_scheduler, d_scheduler):
 # ─────────────────────────────────────────
 def train():
 
-    RESUME_FROM = None
+    RESUME_FROM = "checkpoints/checkpoint_epoch_100.pt"
     # RESUME_FROM = "checkpoints/checkpoint_epoch_100.pt"
 
     writer = SummaryWriter(f"runs/gan_{time.time()}")
@@ -138,7 +142,7 @@ def train():
 
     num_classes = 10
     noise_dim   = 100
-    epochs      = 200
+    epochs      = 300
     
     # Models
     G = Generator(num_classes, noise_dim).to(DEVICE)
@@ -147,9 +151,9 @@ def train():
     # Optimizadores
     g_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
     d_opt = torch.optim.Adam(D.parameters(), lr=0.0002, betas=(0.5, 0.999))
-    
-    g_scheduler = torch.optim.lr_scheduler.StepLR(g_opt, step_size=50, gamma=0.5)
-    d_scheduler = torch.optim.lr_scheduler.StepLR(d_opt, step_size=50, gamma=0.5)
+
+    g_scheduler = torch.optim.lr_scheduler.StepLR(g_opt, step_size=75, gamma=0.6)
+    d_scheduler = torch.optim.lr_scheduler.StepLR(d_opt, step_size=75, gamma=0.6)
 
     criterion = nn.BCEWithLogitsLoss() 
     
@@ -173,12 +177,12 @@ def train():
     global_step = 0
 
     # TRAIN LOOP
-    for epoch in range(1, epochs + 1):
+    for epoch in range(start_epoch, epochs + 1):
         start_time = time.time()
 
         loop = tqdm(dataloader, desc=f"Epoch {epoch}/{epochs}", dynamic_ncols=True, leave=True)
 
-        for i, (real_imgs, real_labels) in enumerate(loop):
+        for _, (real_imgs, real_labels) in enumerate(loop):
 
             real_imgs = real_imgs.to(DEVICE)
             real_labels = real_labels.to(DEVICE)
@@ -262,6 +266,8 @@ def train():
 
         epoch_time = time.time() - start_time
         print(f"Epoch {epoch} | ⏱ {epoch_time:.1f}s | lr_G={g_scheduler.get_last_lr()[0]:.6f}")
+
+
 
     writer.close()
     print("Entrenamiento completado.")
