@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')  # backend sin GUI, solo guarda archivos
+matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -210,9 +210,6 @@ def train():
                 g_opt.zero_grad()
                 fake_imgs = G(noise, sampled_labels)
 
-                # Le decimos a D que evalúe las imágenes falsas
-                # y le pasamos torch.ones porque queremos que D diga "real"
-                # — eso significa que G ha engañado al discriminador
                 g_loss = criterion(
                     D(fake_imgs, sampled_labels),
                     torch.ones(batch_size, 1, device=DEVICE)
@@ -244,7 +241,6 @@ def train():
             with torch.no_grad():
                 writer.add_images("Generated", (G(FIXED_NOISE, FIXED_LABELS) + 1) / 2, global_step=epoch)
 
-        # Guardar modelo
         if epoch % 20 == 0:
             save_checkpoint(epoch, G, D, g_opt, d_opt, g_scheduler, d_scheduler)
         

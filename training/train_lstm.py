@@ -23,7 +23,7 @@ def load_data():
 
 
 def tokenize(texts):
-    tokenizer = Tokenizer(filters='')  # MUY IMPORTANTE: no eliminar < >
+    tokenizer = Tokenizer(filters='')  
     tokenizer.fit_on_texts(texts)
     sequences = tokenizer.texts_to_sequences(texts)
     return sequences, tokenizer

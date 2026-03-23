@@ -1,29 +1,23 @@
 import tensorflow as tf
 from models.cnn_classifier import build_cnn
 
-# Verificar GPU disponible
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
-    # Evita que TensorFlow reserve toda la VRAM de golpe
     tf.config.experimental.set_memory_growth(gpus[0], True)
     print(f"Usando GPU: {gpus[0]}")
 else:
     print("GPU no encontrada, usando CPU")
 
 def load_data():
-    # Load CIFAR-10 dataset
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
     
-    # Normalize pixel values to be between 0 and 1
     x_train, x_test = x_train / 255.0, x_test / 255.0
     
     return x_train, y_train, x_test, y_test
 
 def train_cnn():
-    # Load data
     x_train, y_train, x_test, y_test = load_data()
 
-    # Data augmentation — genera variaciones de las imágenes en cada epoch
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         horizontal_flip=True,
         width_shift_range=0.1,
@@ -33,10 +27,8 @@ def train_cnn():
     )
     datagen.fit(x_train)
 
-    # Build the CNN model
     model = build_cnn()
 
-    # Compile the model
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
         loss='sparse_categorical_crossentropy',
@@ -64,7 +56,6 @@ def train_cnn():
 
     model.summary()
 
-    # Train the model
     model.fit(
         datagen.flow(x_train, y_train, batch_size=64),
         epochs=80,  # Just for local demonstration

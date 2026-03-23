@@ -111,7 +111,6 @@ def generate_description(lstm_model, tokenizer, max_length, category: str,
 
         text += ' ' + next_word
 
-    # limpiar
     result = text.replace('<start>', '').replace('<end>', '').strip()
 
     return result[len(category):].strip()

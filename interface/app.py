@@ -30,10 +30,8 @@ def process(category):
 
     image, description, cnn_result = system.run(category)
 
-    # 🔥 Escalar imagen manteniendo píxeles
     image = upscale_pixel_art(image, scale=10)
 
-    # Extraer clase CNN
     cnn_class = cnn_result.split(" (")[0]
 
     from models.integrated_system import generate_description
